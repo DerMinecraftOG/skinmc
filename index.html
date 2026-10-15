@@ -1,14 +1,14 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minecraft Skins</title>
+
     <link href="https://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
 
     <style>
-        @import url('https://fonts.cdnfonts.com/css/minecraft-4');
-
         * {
             margin: 0;
             padding: 0;
@@ -17,41 +17,53 @@
 
         body {
             background-color: #f0f0f0;
+            color: #333;
             font-family: 'Minecraft', sans-serif;
-        }
-
-        .mc {
-            font-family: 'Minecraft', sans-serif;
-            font-size: 60px;
-            background-color: lightblue;
-            padding: 30px;
-            margin: 0;
-            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .header-container {
             background-color: lightblue;
             padding: 30px;
             position: relative;
+            transition: background-color 0.3s;
         }
 
-        .header {
-            font-size: 30px;
+        .mc {
+            font-family: 'Minecraft', sans-serif;
+            font-size: 45px;
+            background-color: lightblue;
+            padding: 20px 60px;
+            text-align: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Mond-/Sonnen-Button */
+        .theme-toggle {
             position: absolute;
             top: 50%;
+            right: 25px;
             transform: translateY(-50%);
-            text-decoration: none;
+            width: 50px;
+            height: 50px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            background-color: #ffffff;
             color: #333;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s, transform 0.3s;
+            z-index: 10;
         }
 
-        .header.left {
-            left: 30px;
+        .theme-toggle:hover {
+            transform: translateY(-50%) scale(1.1);
         }
 
-        .header.right {
-            right: 30px;
-        }
-
+        /* Skin-Karten */
         .skins-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -67,6 +79,7 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .skin-image {
@@ -84,6 +97,7 @@
             font-size: 24px;
             margin-bottom: 10px;
             color: #333;
+            transition: color 0.3s;
         }
 
         .skin-card p {
@@ -119,15 +133,87 @@
         .download-btn:hover {
             background-color: #45a049;
         }
+
+        /* Dunkelmodus */
+        body.dark-mode {
+            background-color: #181818;
+            color: #f5f5f5;
+        }
+
+        body.dark-mode .header-container,
+        body.dark-mode .mc {
+            background-color: #263238;
+            color: #ffffff;
+        }
+
+        body.dark-mode .skin-card {
+            background-color: #292929;
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .skin-card h3 {
+            color: #ffffff;
+        }
+
+        body.dark-mode .skin-card p {
+            color: #cccccc;
+        }
+
+        body.dark-mode .skin-image {
+            background-color: #383838;
+        }
+
+        body.dark-mode .theme-toggle {
+            background-color: #333333;
+            color: #ffffff;
+            border-color: #555555;
+        }
+
+        /* Mobile Ansicht */
+        @media (max-width: 600px) {
+            .header-container {
+                padding: 20px 10px;
+            }
+
+            .mc {
+                font-size: 25px;
+                padding: 20px 45px 20px 10px;
+            }
+
+            .theme-toggle {
+                right: 10px;
+                width: 40px;
+                height: 40px;
+                font-size: 23px;
+            }
+
+            .skins-container {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                padding: 15px;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- Kopfbereich -->
     <div class="header-container">
         <h1 class="mc">Minecraft Skins</h1>
+
+        <button
+            id="themeToggle"
+            class="theme-toggle"
+            onclick="toggleTheme()"
+            aria-label="Dunkelmodus aktivieren"
+            title="Hell-/Dunkelmodus wechseln">
+            🌙
+        </button>
     </div>
 
+    <!-- Skin-Galerie -->
     <div class="skins-container">
 
         <div class="skin-card">
@@ -135,7 +221,10 @@
             <div class="skin-card-content">
                 <h3>#1</h3>
                 <div class="rank">🥇 #1</div>
-                <a href="skin1.png" download="skin1.png" class="download-btn">⬇️ Download</a>
+                <br>
+                <a href="skin1.png" download="skin1.png" class="download-btn">
+                    ⬇️ Download
+                </a>
             </div>
         </div>
 
@@ -144,7 +233,10 @@
             <div class="skin-card-content">
                 <h3>#2</h3>
                 <div class="rank">🥈 #2</div>
-                <a href="skin2.png" download="skin2.png" class="download-btn">⬇️ Download</a>
+                <br>
+                <a href="skin2.png" download="skin2.png" class="download-btn">
+                    ⬇️ Download
+                </a>
             </div>
         </div>
 
@@ -153,7 +245,10 @@
             <div class="skin-card-content">
                 <h3>#3</h3>
                 <div class="rank">🥉 #3</div>
-                <a href="skin3.png" download="skin3.png" class="download-btn">⬇️ Download</a>
+                <br>
+                <a href="skin3.png" download="skin3.png" class="download-btn">
+                    ⬇️ Download
+                </a>
             </div>
         </div>
 
@@ -162,7 +257,10 @@
             <div class="skin-card-content">
                 <h3>#4</h3>
                 <div class="rank">⭐ #4</div>
-                <a href="skin4.png" download="skin4.png" class="download-btn">⬇️ Download</a>
+                <br>
+                <a href="skin4.png" download="skin4.png" class="download-btn">
+                    ⬇️ Download
+                </a>
             </div>
         </div>
 
@@ -171,7 +269,10 @@
             <div class="skin-card-content">
                 <h3>#5</h3>
                 <div class="rank">⭐ #5</div>
-                <a href="skin5.png" download="skin5.png" class="download-btn">⬇️ Download</a>
+                <br>
+                <a href="skin5.png" download="skin5.png" class="download-btn">
+                    ⬇️ Download
+                </a>
             </div>
         </div>
 
@@ -180,18 +281,48 @@
             <div class="skin-card-content">
                 <h3>#6</h3>
                 <div class="rank">⭐ #6</div>
-                <a href="skin6.png" download="skin6.png" class="download-btn">⬇️ Download</a>
+                <br>
+                <a href="skin6.png" download="skin6.png" class="download-btn">
+                    ⬇️ Download
+                </a>
             </div>
         </div>
 
     </div>
 
+    <!-- Skin-Viewer-Bibliothek -->
     <script src="https://unpkg.com/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
 
     <script>
+        // Hell- und Dunkelmodus umschalten
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.getElementById("themeToggle");
+
+            body.classList.toggle("dark-mode");
+
+            const isDark = body.classList.contains("dark-mode");
+
+            button.textContent = isDark ? "☀️" : "🌙";
+
+            button.setAttribute(
+                "aria-label",
+                isDark
+                    ? "Hellmodus aktivieren"
+                    : "Dunkelmodus aktivieren"
+            );
+
+            button.title = isDark
+                ? "Zum Hellmodus wechseln"
+                : "Zum Dunkelmodus wechseln";
+        }
+
+        // Minecraft-Skin erstellen
         function createSkin(canvasId, skinPath) {
+            const canvas = document.getElementById(canvasId);
+
             const viewer = new skinview3d.SkinViewer({
-                canvas: document.getElementById(canvasId),
+                canvas: canvas,
                 width: 250,
                 height: 300,
                 skin: skinPath
@@ -203,6 +334,7 @@
             viewer.camera.position.set(0, 0, 60);
         }
 
+        // Alle sechs Skins laden
         createSkin("skin1", "skin1.png");
         createSkin("skin2", "skin2.png");
         createSkin("skin3", "skin3.png");
