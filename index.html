@@ -22,6 +22,7 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* Kopfbereich */
         .header-container {
             background-color: lightblue;
             padding: 30px;
@@ -48,22 +49,22 @@
             height: 50px;
             border: 2px solid rgba(0, 0, 0, 0.1);
             border-radius: 50%;
-            background-color: #ffffff;
+            background-color: white;
             color: #333;
             font-size: 28px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.3s, transform 0.3s;
             z-index: 10;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
         .theme-toggle:hover {
             transform: translateY(-50%) scale(1.1);
         }
 
-        /* Skin-Karten */
+        /* Skin-Galerie */
         .skins-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -143,21 +144,21 @@
         body.dark-mode .header-container,
         body.dark-mode .mc {
             background-color: #263238;
-            color: #ffffff;
+            color: white;
         }
 
         body.dark-mode .skin-card {
             background-color: #292929;
-            color: #ffffff;
+            color: white;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
 
         body.dark-mode .skin-card h3 {
-            color: #ffffff;
+            color: white;
         }
 
         body.dark-mode .skin-card p {
-            color: #cccccc;
+            color: #ccc;
         }
 
         body.dark-mode .skin-image {
@@ -165,9 +166,9 @@
         }
 
         body.dark-mode .theme-toggle {
-            background-color: #333333;
-            color: #ffffff;
-            border-color: #555555;
+            background-color: #333;
+            color: white;
+            border-color: #555;
         }
 
         /* Mobile Ansicht */
@@ -294,14 +295,14 @@
     <script src="https://unpkg.com/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
 
     <script>
-        // Hell- und Dunkelmodus umschalten
-        function toggleTheme() {
-            const body = document.body;
+        // Gespeicherten Modus beim Laden wiederherstellen
+        function loadTheme() {
+            const savedTheme = localStorage.getItem("theme");
             const button = document.getElementById("themeToggle");
 
-            body.classList.toggle("dark-mode");
+            const isDark = savedTheme === "dark";
 
-            const isDark = body.classList.contains("dark-mode");
+            document.body.classList.toggle("dark-mode", isDark);
 
             button.textContent = isDark ? "☀️" : "🌙";
 
@@ -317,7 +318,37 @@
                 : "Zum Dunkelmodus wechseln";
         }
 
-        // Minecraft-Skin erstellen
+        // Modus wechseln und dauerhaft speichern
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.getElementById("themeToggle");
+
+            body.classList.toggle("dark-mode");
+
+            const isDark = body.classList.contains("dark-mode");
+
+            // Auswahl im Browser speichern
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+
+            // Symbol und Beschriftung aktualisieren
+            button.textContent = isDark ? "☀️" : "🌙";
+
+            button.setAttribute(
+                "aria-label",
+                isDark
+                    ? "Hellmodus aktivieren"
+                    : "Dunkelmodus aktivieren"
+            );
+
+            button.title = isDark
+                ? "Zum Hellmodus wechseln"
+                : "Zum Dunkelmodus wechseln";
+        }
+
+        // Gespeicherten Modus anwenden
+        loadTheme();
+
+        // Minecraft-Skin-Vorschau erstellen
         function createSkin(canvasId, skinPath) {
             const canvas = document.getElementById(canvasId);
 
