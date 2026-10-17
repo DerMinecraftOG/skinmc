@@ -39,6 +39,84 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        .submit-skin-btn {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 12px 16px;
+            border: 2px solid rgba(0,0,0,.15);
+            border-radius: 6px;
+            background: #4caf50;
+            color: white;
+            font-family: 'Minecraft', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #2d7830;
+        }
+        .submit-skin-btn:hover { background: #43a047; }
+
+        /* Einsende-Dialog: gut lesbare Standardschrift für kleine Texte */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0,0,0,.72);
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .modal-backdrop.open { display: flex; }
+        .skin-modal {
+            width: min(100%, 520px);
+            max-height: 92vh;
+            overflow-y: auto;
+            background: #fff;
+            color: #222;
+            border-radius: 10px;
+            padding: 24px;
+            box-shadow: 0 12px 40px rgba(0,0,0,.35);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .skin-modal h2 {
+            font-family: 'Minecraft', sans-serif;
+            font-size: 19px;
+            line-height: 1.6;
+            margin: 0 30px 18px 0;
+            color: #222;
+        }
+        .modal-close {
+            float: right;
+            border: 0;
+            background: transparent;
+            font-size: 28px;
+            cursor: pointer;
+            color: #333;
+            line-height: 1;
+        }
+        .skin-form label { display: block; font-weight: 700; margin: 14px 0 6px; font-size: 14px; }
+        .skin-form input:not([type="checkbox"]), .skin-form textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            font: 16px Arial, Helvetica, sans-serif;
+            color: #222;
+            background: #fff;
+        }
+        .skin-form textarea { min-height: 90px; resize: vertical; }
+        .skin-form .hint { color: #444; font-size: 13px; line-height: 1.5; margin-top: 5px; }
+        .skin-form .consent { display: flex; align-items: flex-start; gap: 9px; font-weight: 400; line-height: 1.45; }
+        .skin-form .consent input { margin-top: 3px; flex-shrink: 0; }
+        .skin-preview { display: none; max-width: 140px; max-height: 180px; margin-top: 12px; image-rendering: pixelated; border: 1px solid #ccc; }
+        .form-message { margin-top: 12px; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere; }
+        .form-actions { display: flex; gap: 10px; margin-top: 18px; }
+        .form-actions button { flex: 1; padding: 12px; border: 0; border-radius: 5px; cursor: pointer; font-weight: 700; font-size: 14px; }
+        .send-submit { background: #3b873e; color: white; }
+        .cancel-submit { background: #e5e5e5; color: #222; }
+
         /* Mond-/Sonnen-Button */
         .theme-toggle {
             position: absolute;
@@ -179,8 +257,11 @@
 
             .mc {
                 font-size: 25px;
-                padding: 20px 45px 20px 10px;
+                padding: 55px 45px 15px 10px;
             }
+
+            .submit-skin-btn { left: 10px; top: 15px; transform: none; font-size: 10px; padding: 9px 10px; }
+            .skin-modal { padding: 18px; }
 
             .theme-toggle {
                 right: 10px;
@@ -202,6 +283,7 @@
 
     <!-- Kopfbereich -->
     <div class="header-container">
+        <button class="submit-skin-btn" type="button" onclick="openSkinModal()">＋ Skin einsenden</button>
         <h1 class="mc">Minecraft Skins</h1>
 
         <button
@@ -212,6 +294,37 @@
             title="Hell-/Dunkelmodus wechseln">
             🌙
         </button>
+    </div>
+
+    <!-- Skin-Einsende-Dialog -->
+    <div class="modal-backdrop" id="skinModalBackdrop" role="dialog" aria-modal="true" aria-labelledby="skinModalTitle">
+        <section class="skin-modal">
+            <button class="modal-close" type="button" onclick="closeSkinModal()" aria-label="Dialog schließen">&times;</button>
+            <h2 id="skinModalTitle">Skin einsenden</h2>
+            <p style="font-size:14px;line-height:1.5;color:#333">Lade deinen Skin hoch und gib die drei Informationen an. Die Einsendung wird an den konfigurierten Discord-Webhook geschickt.</p>
+            <form class="skin-form" id="skinSubmitForm">
+                <label for="skinFile">Minecraft-Skin (PNG)</label>
+                <input id="skinFile" name="skin" type="file" accept="image/png,.png" required>
+                <div class="hint">PNG-Datei, maximal 2 MB. Übliche Skin-Größen sind 64×64 oder 64×32 Pixel.</div>
+                <img id="skinPreview" class="skin-preview" alt="Vorschau des ausgewählten Skins">
+
+                <label for="minecraftName">Minecraft-Name</label>
+                <input id="minecraftName" name="minecraftName" type="text" maxlength="16" pattern="[A-Za-z0-9_]{3,16}" placeholder="DeinMinecraftName" required>
+
+                <label for="discordTag">Discord-Tag oder Benutzername</label>
+                <input id="discordTag" name="discordTag" type="text" maxlength="80" placeholder="z. B. name oder name#1234" required>
+
+                <label for="skinDescription">Kurze Beschreibung</label>
+                <textarea id="skinDescription" name="description" maxlength="500" placeholder="Erzähl kurz etwas über deinen Skin …" required></textarea>
+
+                <label class="consent"><input id="skinConsent" type="checkbox" required><span>Ich habe das Recht, diesen Skin einzusenden, und bin damit einverstanden, dass die Angaben zur Prüfung an das Discord-Team übermittelt werden.</span></label>
+                <div class="form-message" id="skinFormMessage" role="status" aria-live="polite"></div>
+                <div class="form-actions">
+                    <button class="cancel-submit" type="button" onclick="closeSkinModal()">Abbrechen</button>
+                    <button class="send-submit" id="skinSendButton" type="submit">Einsenden</button>
+                </div>
+            </form>
+        </section>
     </div>
 
     <!-- Skin-Galerie -->
@@ -271,12 +384,123 @@
             </div>
         </div>
 
+
+
+        <div class="skin-card">
+            <canvas id="skin7" class="skin-image"></canvas>
+            <div class="skin-card-content">
+                <a href="skin7.png" download="skin7.png" class="download-btn">
+                    ⬇️ Download
+                </a>
+            </div>
+        </div>
+
     </div>
 
     <!-- Skin-Viewer-Bibliothek -->
     <script src="https://unpkg.com/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
 
     <script>
+        // WEBHOOK-URL HIER EINTRAGEN. Achtung: Bei reinem Frontend ist diese URL öffentlich sichtbar!
+        const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1561025671633838101/0EfkBQLUCXp7-JIAJ4lE85tdIb3JPltJHeZljIylbTFEadJair4OF37tkSQAnCaNQ3N7";
+
+        const skinModalBackdrop = document.getElementById("skinModalBackdrop");
+        const skinSubmitForm = document.getElementById("skinSubmitForm");
+        const skinFileInput = document.getElementById("skinFile");
+        const skinPreview = document.getElementById("skinPreview");
+        const skinFormMessage = document.getElementById("skinFormMessage");
+        const skinSendButton = document.getElementById("skinSendButton");
+
+        function openSkinModal() {
+            skinModalBackdrop.classList.add("open");
+            document.getElementById("minecraftName").focus();
+        }
+        function closeSkinModal() {
+            skinModalBackdrop.classList.remove("open");
+        }
+        skinModalBackdrop.addEventListener("click", function (event) {
+            if (event.target === skinModalBackdrop) closeSkinModal();
+        });
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") closeSkinModal();
+        });
+
+        skinFileInput.addEventListener("change", function () {
+            const file = skinFileInput.files[0];
+            skinPreview.style.display = "none";
+            skinPreview.removeAttribute("src");
+            if (!file) return;
+            if (file.type !== "image/png" && !file.name.toLowerCase().endsWith(".png")) {
+                skinFileInput.value = "";
+                skinFormMessage.style.color = "#b00020";
+                skinFormMessage.textContent = "Bitte wähle eine PNG-Datei aus.";
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) {
+                skinFileInput.value = "";
+                skinFormMessage.style.color = "#b00020";
+                skinFormMessage.textContent = "Die Datei ist größer als 2 MB.";
+                return;
+            }
+            skinFormMessage.textContent = "";
+            skinPreview.src = URL.createObjectURL(file);
+            skinPreview.style.display = "block";
+        });
+
+        skinSubmitForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const file = skinFileInput.files[0];
+            if (!file) return;
+            if (!DISCORD_WEBHOOK_URL.startsWith("https://discord.com/api/webhooks/") && !DISCORD_WEBHOOK_URL.startsWith("https://discordapp.com/api/webhooks/")) {
+                skinFormMessage.style.color = "#b00020";
+                skinFormMessage.textContent = "";
+                return;
+            }
+
+            const mcName = document.getElementById("minecraftName").value.trim();
+            const discordTag = document.getElementById("discordTag").value.trim();
+            const description = document.getElementById("skinDescription").value.trim();
+            const payload = {
+                username: "Minecraft Skin Einsendungen",
+                allowed_mentions: { parse: [] },
+                embeds: [{
+                    title: "Neue Minecraft-Skin-Einsendung",
+                    color: 5763719,
+                    fields: [
+                        { name: "Minecraft-Name", value: mcName.slice(0, 100), inline: true },
+                        { name: "Discord", value: discordTag.slice(0, 100), inline: true },
+                        { name: "Beschreibung", value: description.slice(0, 1000) || "Keine Beschreibung", inline: false }
+                    ],
+                    footer: { text: "Skin-Galerie • PNG als Anhang" },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+            const data = new FormData();
+            data.append("payload_json", JSON.stringify(payload));
+            data.append("files[0]", file, file.name);
+
+            skinSendButton.disabled = true;
+            skinSendButton.textContent = "Wird gesendet …";
+            skinFormMessage.style.color = "#333";
+            skinFormMessage.textContent = "Deine Einsendung wird gesendet …";
+            try {
+                const response = await fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: data });
+                if (!response.ok) throw new Error("Discord antwortete mit HTTP " + response.status);
+                skinFormMessage.style.color = "#18752b";
+                skinFormMessage.textContent = "Einsendung wurde an unser Team gesendet. Danke!";
+                skinSubmitForm.reset();
+                skinPreview.style.display = "none";
+                skinPreview.removeAttribute("src");
+            } catch (error) {
+                skinFormMessage.style.color = "#b00020";
+                skinFormMessage.textContent = "";
+                console.error("Discord-Webhook-Fehler:", error);
+            } finally {
+                skinSendButton.disabled = false;
+                skinSendButton.textContent = "Einsenden";
+            }
+        });
+
         // Gespeicherten Modus beim Laden wiederherstellen
         function loadTheme() {
             const savedTheme = localStorage.getItem("theme");
@@ -347,13 +571,13 @@
             viewer.camera.position.set(0, 0, 60);
         }
 
-        // Alle sechs Skins laden
         createSkin("skin1", "skin1.png");
         createSkin("skin2", "skin2.png");
         createSkin("skin3", "skin3.png");
         createSkin("skin4", "skin4.png");
         createSkin("skin5", "skin5.png");
         createSkin("skin6", "skin6.png");
+        createSkin("skin7", "skin7.png");
     </script>
 
 </body>
